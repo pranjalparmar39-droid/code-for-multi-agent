@@ -1,0 +1,9 @@
+langchain
+langchain-groq
+langchain-community
+langchain-tavily
+tavily-python
+streamlit
+wikipedia
+pypdf
+python-dotenv
