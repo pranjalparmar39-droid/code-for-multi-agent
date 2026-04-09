@@ -1,9 +1,9 @@
-streamlit
+streamlit==1.33.0
 langchain==0.1.16
 langchain-community==0.0.32
 langchain-core==0.1.42
-langchain-groq
-python-dotenv
-wikipedia
-pypdf
-tavily-python
+langchain-groq==0.0.1
+python-dotenv==1.0.1
+wikipedia==1.4.0
+pypdf==4.2.0
+tavily-python==0.3.3
