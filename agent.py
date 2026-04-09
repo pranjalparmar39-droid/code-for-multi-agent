@@ -1,24 +1,14 @@
-"""
-agent.py
---------
-ReAct agent using LangChain + Groq (clean & simplified)
-"""
-
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain.agents import AgentExecutor
+from langchain.agents.react.agent import create_react_agent
 from langchain.prompts import PromptTemplate
 
 from tools import get_all_tools
 
-# Load env variables
 load_dotenv()
 
-
-# ─────────────────────────────────────────────
-# PROMPT (SIMPLIFIED + HUMAN-LIKE)
-# ─────────────────────────────────────────────
 REACT_PROMPT_TEMPLATE = """
 You are an AI assistant built by Pranjal.
 
@@ -51,9 +41,7 @@ Final Answer: give final answer
 {agent_scratchpad}
 """
 
-# ─────────────────────────────────────────────
-# CREATE AGENT
-# ─────────────────────────────────────────────
+
 def create_agent_executor():
 
     groq_api_key = os.getenv("GROQ_API_KEY")
@@ -61,48 +49,42 @@ def create_agent_executor():
     if not groq_api_key:
         raise ValueError("GROQ_API_KEY is missing")
 
-    # LLM
     llm = ChatGroq(
-        model=os.getenv("MODEL_NAME", "moonshotai/kimi-k2-instruct-0905"), #new
+        model="llama3-70b-8192",
         temperature=0.3,
         groq_api_key=groq_api_key,
     )
 
-    # Tools
     tools = get_all_tools()
 
-    # Prompt
     prompt = PromptTemplate(
         input_variables=[
             "tools",
             "tool_names",
-            "chat_history",
             "input",
             "agent_scratchpad",
         ],
         template=REACT_PROMPT_TEMPLATE,
     )
 
-    # Agent
     agent = create_react_agent(
         llm=llm,
         tools=tools,
         prompt=prompt
     )
 
-    # Executor (simplified)
     executor = AgentExecutor(
         agent=agent,
         tools=tools,
-        max_iterations=5
+        verbose=True,
+        return_intermediate_steps=True,
+        max_iterations=5,
+        handle_parsing_errors=True
     )
 
     return executor
 
 
-# ─────────────────────────────────────────────
-# RUN AGENT
-# ─────────────────────────────────────────────
 def run_agent(executor, query):
     try:
         result = executor.invoke({"input": query})
